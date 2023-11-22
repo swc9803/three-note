@@ -1,0 +1,177 @@
+@font-face {
+  font-family: "NanumSquare";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/NanumSquareL.woff2") format("woff2");
+}
+@font-face {
+  font-family: "NanumSquare";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/NanumSquareR.woff2") format("woff2");
+}
+@font-face {
+  font-family: "NanumSquare";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/NanumSquareB.woff2") format("woff2");
+}
+@font-face {
+  font-family: "NanumSquare";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("/NanumSquareEB.woff2") format("woff2");
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+// body {
+//   overflow-x: hidden;
+// }
+
+p,
+ul,
+label,
+a,
+button,
+input,
+textarea,
+table {
+  font-family: NanumSquare;
+}
+
+a {
+  text-decoration: none;
+}
+
+img,
+svg {
+  vertical-align: bottom;
+}
+
+input {
+  display: block;
+  width: 100%;
+  border: none;
+  &:focus {
+    outline: none;
+  }
+  &:hover {
+    outline: none;
+  }
+  //   &::placeholder {
+  //   }
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-size: 1em;
+}
+
+textarea,
+input {
+  &:focus {
+    outline: none;
+  }
+  &:hover {
+    outline: none;
+  }
+  //   &::placeholder {
+  //   }
+}
+
+.checkbox-container {
+  position: relative;
+  padding-left: 30px;
+  cursor: pointer;
+  input {
+    position: absolute;
+    height: 0;
+    width: 0;
+    opacity: 0;
+  }
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid red;
+    border-radius: 2px;
+    &:after {
+      // 체크 표시
+      content: "";
+      position: absolute;
+      display: none;
+      left: 6px;
+      top: 3px;
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+  input:checked ~ .checkmark {
+    background: blue;
+    border: none;
+    &:after {
+      display: block;
+    }
+  }
+}
+
+.radio-container {
+  position: relative;
+  display: inline-block;
+  padding-left: 35px;
+  cursor: pointer;
+  input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    height: 0;
+    width: 0;
+  }
+  .custom-radio {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    border: 1px solid red;
+    border-radius: 50%;
+  }
+
+  input[type="radio"]:checked ~ .custom-radio {
+    background: white;
+  }
+
+  input[type="radio"]:checked ~ .custom-radio::after {
+    content: "";
+    position: absolute;
+    top: 49%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: blue;
+    border-radius: 50%;
+  }
+}
+
+.focusFade-enter-active,
+.focusFade-leave-active {
+  transition: opacity 0.3s ease-in-out;
+}
+.focusFade-enter-from,
+.focusFade-leave-to {
+  opacity: 0;
+}
