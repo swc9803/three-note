@@ -20,8 +20,6 @@ const scene = new THREE.Scene();
 const group = new THREE.Group();
 scene.add(group);
 
-const vertices = [];
-const colors = [];
 const sparklesGeometry = new THREE.BufferGeometry();
 const sparklesMaterial = new THREE.PointsMaterial({
   size: 3,
@@ -35,55 +33,81 @@ const points = new THREE.Points(sparklesGeometry, sparklesMaterial);
 group.add(points);
 
 let sampler;
-let elephant;
+const paths = [];
 new OBJLoader().load(
   "https://assets.codepen.io/127738/Mesh_Elephant.obj",
   (obj) => {
-    elephant = obj.children[0];
-    elephant.material = new THREE.MeshBasicMaterial({
-      wireframe: true,
-      color: 0x000000,
-      transparent: true,
-      opacity: 0.05,
-    });
-    group.add(obj);
+    sampler = new MeshSurfaceSampler(obj.children[0]).build();
 
-    sampler = new MeshSurfaceSampler(elephant).build();
+    for (let i = 0; i < 4; i++) {
+      const path = new Path(i);
+      paths.push(path);
+      group.add(path.line);
+    }
   },
   (xhr) => console.log((xhr.loaded / xhr.total) * 100 + "% loaded"),
   (err) => console.error(err),
 );
 
-const palette = [
-  new THREE.Color("#FAAD80"),
-  new THREE.Color("#FF6767"),
-  new THREE.Color("#FF3D68"),
-  new THREE.Color("#A73489"),
-];
 const tempPosition = new THREE.Vector3();
+const materials = [
+  new THREE.LineBasicMaterial({
+    color: 0xfaad80,
+    transparent: true,
+    opacity: 0.5,
+  }),
+  new THREE.LineBasicMaterial({
+    color: 0xff6767,
+    transparent: true,
+    opacity: 0.5,
+  }),
+  new THREE.LineBasicMaterial({
+    color: 0xff3d68,
+    transparent: true,
+    opacity: 0.5,
+  }),
+  new THREE.LineBasicMaterial({
+    color: 0xa73489,
+    transparent: true,
+    opacity: 0.5,
+  }),
+];
+class Path {
+  constructor(index) {
+    this.geometry = new THREE.BufferGeometry();
+    this.material = materials[index % 4];
+    this.line = new THREE.Line(this.geometry, this.material);
+    this.vertices = [];
 
-const addPoint = () => {
-  sampler.sample(tempPosition);
-  vertices.push(tempPosition.x, tempPosition.y, tempPosition.z);
-  sparklesGeometry.setAttribute(
-    "position",
-    new THREE.Float32BufferAttribute(vertices, 3),
-  );
+    sampler.sample(tempPosition);
+    this.previousPoint = tempPosition.clone();
+  }
 
-  const color = palette[Math.floor(Math.random() * palette.length)];
-  colors.push(color.r, color.g, color.b);
-  sparklesGeometry.setAttribute(
-    "color",
-    new THREE.Float32BufferAttribute(colors, 3),
-  );
-};
+  update() {
+    let pointFound = false;
+    while (!pointFound) {
+      sampler.sample(tempPosition);
+      if (tempPosition.distanceTo(this.previousPoint) < 30) {
+        this.vertices.push(tempPosition.x, tempPosition.y, tempPosition.z);
+        this.previousPoint = tempPosition.clone();
+        pointFound = true;
+      }
+    }
+    this.geometry.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(this.vertices, 3),
+    );
+  }
+}
 
 const animate = () => {
   group.rotation.y += 0.002;
 
-  if (sampler && vertices.length < 30000) {
-    addPoint();
-  }
+  paths.forEach((path) => {
+    if (path.vertices.length < 10000) {
+      path.update();
+    }
+  });
 
   renderer.render(scene, camera);
 
