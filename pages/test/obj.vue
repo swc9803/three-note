@@ -20,22 +20,10 @@ const scene = new THREE.Scene();
 const group = new THREE.Group();
 scene.add(group);
 
-const sparklesGeometry = new THREE.BufferGeometry();
-const sparklesMaterial = new THREE.PointsMaterial({
-  size: 3,
-  alphaTest: 0.2,
-  map: new THREE.TextureLoader().load(
-    "https://assets.codepen.io/127738/dotTexture.png",
-  ),
-  vertexColors: true,
-});
-const points = new THREE.Points(sparklesGeometry, sparklesMaterial);
-group.add(points);
-
 let sampler;
 const paths = [];
 new OBJLoader().load(
-  "https://assets.codepen.io/127738/Mesh_Elephant.obj",
+  "/whale.obj",
   (obj) => {
     sampler = new MeshSurfaceSampler(obj.children[0]).build();
 
@@ -45,8 +33,7 @@ new OBJLoader().load(
       group.add(path.line);
     }
   },
-  (xhr) => console.log((xhr.loaded / xhr.total) * 100 + "% loaded"),
-  (err) => console.error(err),
+  // (xhr) => console.log((xhr.loaded / xhr.total) * 100 + "% loaded"),
 );
 
 const tempPosition = new THREE.Vector3();
@@ -87,7 +74,7 @@ class Path {
     let pointFound = false;
     while (!pointFound) {
       sampler.sample(tempPosition);
-      if (tempPosition.distanceTo(this.previousPoint) < 30) {
+      if (tempPosition.distanceTo(this.previousPoint) < 5) {
         this.vertices.push(tempPosition.x, tempPosition.y, tempPosition.z);
         this.previousPoint = tempPosition.clone();
         pointFound = true;
@@ -104,7 +91,7 @@ const animate = () => {
   group.rotation.y += 0.002;
 
   paths.forEach((path) => {
-    if (path.vertices.length < 10000) {
+    if (path.vertices.length < 5000) {
       path.update();
     }
   });
@@ -133,7 +120,7 @@ onMounted(() => {
     0.1,
     1000,
   );
-  camera.position.z = 300;
+  camera.position.z = 30;
 
   onResize();
   animate();
@@ -156,5 +143,6 @@ onBeforeUnmount(() => {
   transform: translate3d(0, 0, 0);
   width: 100%;
   height: 100vh;
+  background: #111111;
 }
 </style>
