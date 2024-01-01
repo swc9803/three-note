@@ -20,41 +20,60 @@ const scene = new THREE.Scene();
 const group = new THREE.Group();
 scene.add(group);
 
+const addSphere = () => {
+  const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+  const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+  for (let z = -1000; z < 1000; z += 5) {
+    const sphere = new THREE.Mesh(geometry, material);
+
+    sphere.position.x = (Math.random() - 0.5) * 1000;
+    sphere.position.y = (Math.random() - 0.5) * 1000;
+    sphere.position.z = z;
+
+    sphere.scale.set(2, 2, 2);
+
+    group.add(sphere);
+  }
+};
+
 let sampler;
 const paths = [];
-new OBJLoader().load(
-  "/whale.obj",
-  (obj) => {
-    sampler = new MeshSurfaceSampler(obj.children[0]).build();
+const loadObj = () => {
+  new OBJLoader().load(
+    "/whale.obj",
+    (obj) => {
+      sampler = new MeshSurfaceSampler(obj.children[0]).build();
 
-    for (let i = 0; i < 4; i++) {
-      const path = new Path(i);
-      paths.push(path);
-      group.add(path.line);
-    }
-  },
-  // (xhr) => console.log((xhr.loaded / xhr.total) * 100 + "% loaded"),
-);
+      for (let i = 0; i < 4; i++) {
+        const path = new Path(i);
+        paths.push(path);
+        group.add(path.line);
+      }
+    },
+    // (xhr) => console.log((xhr.loaded / xhr.total) * 100 + "% loaded"),
+  );
+};
 
 const tempPosition = new THREE.Vector3();
 const materials = [
   new THREE.LineBasicMaterial({
-    color: 0xfaad80,
+    color: 0xd7e0ff,
     transparent: true,
     opacity: 0.5,
   }),
   new THREE.LineBasicMaterial({
-    color: 0xff6767,
+    color: 0xe2e9ff,
     transparent: true,
     opacity: 0.5,
   }),
   new THREE.LineBasicMaterial({
-    color: 0xff3d68,
+    color: 0xa5b9ff,
     transparent: true,
     opacity: 0.5,
   }),
   new THREE.LineBasicMaterial({
-    color: 0xa73489,
+    color: 0xb0c2ff,
     transparent: true,
     opacity: 0.5,
   }),
@@ -88,7 +107,7 @@ class Path {
 }
 
 const animate = () => {
-  group.rotation.y += 0.002;
+  group.rotation.y += 0.001;
 
   paths.forEach((path) => {
     if (path.vertices.length < 5000) {
@@ -122,6 +141,8 @@ onMounted(() => {
   );
   camera.position.z = 30;
 
+  loadObj();
+  addSphere();
   onResize();
   animate();
 
